@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Select, MenuItem, Stack } from "@mui/material";
+import { 
+  Box, 
+  Button, 
+  TextField, 
+  Select, 
+  MenuItem, 
+  Stack,
+  useTheme,
+  useMediaQuery 
+} from "@mui/material";
 import { motion } from "framer-motion";
 import ImageGallery from '../components/ImageGallery';
 import ImageEditorDrawer from '../components/ImageEditorDrawer';
@@ -8,6 +17,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 
 const GalleryPage = ({ images, onAddMore, onUpdateImage }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [selectedImage, setSelectedImage] = useState(null);
@@ -44,18 +56,19 @@ const GalleryPage = ({ images, onAddMore, onUpdateImage }) => {
     });
 
   return (
-    <Box sx={{ mt: 3 }}>
+    <Box sx={{ mt: isMobile ? 2 : 3 }}>
       <Stack 
-        direction="row" 
+        direction={isMobile ? "column" : "row"} 
         spacing={2} 
-        alignItems="center" 
+        alignItems={isMobile ? "stretch" : "center"}
         justifyContent="space-between"
-        sx={{ mb: 3 }}
+        sx={{ mb: isMobile ? 2 : 3 }}
       >
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={onAddMore}
+          fullWidth={isMobile}
           sx={{
             backgroundColor: '#1a237e',
             '&:hover': {
@@ -66,13 +79,18 @@ const GalleryPage = ({ images, onAddMore, onUpdateImage }) => {
           Add More
         </Button>
 
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Stack 
+          direction={isMobile ? "column" : "row"} 
+          spacing={1} 
+          sx={{ width: isMobile ? '100%' : 'auto' }}
+        >
           <TextField
             placeholder="Search assets..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            size="small"
-            sx={{ width: 200 }}
+            size={isMobile ? "small" : "medium"}
+            fullWidth={isMobile}
+            sx={{ width: isMobile ? '100%' : 200 }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -85,15 +103,16 @@ const GalleryPage = ({ images, onAddMore, onUpdateImage }) => {
           <Select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            size="small"
-            sx={{ width: 120 }}
+            size={isMobile ? "small" : "medium"}
+            fullWidth={isMobile}
+            sx={{ width: isMobile ? '100%' : 120 }}
           >
             <MenuItem value="newest">Newest</MenuItem>
             <MenuItem value="oldest">Oldest</MenuItem>
             <MenuItem value="a-z">A-Z</MenuItem>
             <MenuItem value="z-a">Z-A</MenuItem>
           </Select>
-        </Box>
+        </Stack>
       </Stack>
 
       <motion.div
