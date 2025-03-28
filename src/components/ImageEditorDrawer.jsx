@@ -33,7 +33,6 @@ const ImageEditorDrawer = ({ open, image, onClose, onSave }) => {
   const [isCropping, setIsCropping] = useState(false);
   const [aspect, setAspect] = useState(null);
 
-  // Reset state when drawer opens
   useEffect(() => {
     if (open) {
       setCrop({ x: 0, y: 0 });
@@ -56,6 +55,10 @@ const ImageEditorDrawer = ({ open, image, onClose, onSave }) => {
 
   const handleFlipVertical = () => {
     setFlipVertical(!flipVertical);
+  };
+
+  const handleZoomChange = (_, value) => {
+    setZoom(value);
   };
 
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
@@ -126,7 +129,8 @@ const ImageEditorDrawer = ({ open, image, onClose, onSave }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: isMobile ? '50vh' : '0'
+          minHeight: isMobile ? '50vh' : '0',
+          overflow: 'hidden'
         }}>
           {image && (
             <Cropper
@@ -139,7 +143,22 @@ const ImageEditorDrawer = ({ open, image, onClose, onSave }) => {
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
               objectFit="contain"
-              transform={`scale(${flipHorizontal ? -1 : 1}, ${flipVertical ? -1 : 1})`}
+              minZoom={0.5}
+              maxZoom={3}
+              cropShape={isCropping ? "rect" : "rect"}
+              showGrid={isCropping}
+              style={{
+                containerStyle: {
+                  width: '100%',
+                  height: '100%',
+                  position: 'relative'
+                },
+                mediaStyle: {
+                  width: '100%',
+                  height: '100%',
+                  transform: `scale(${flipHorizontal ? -1 : 1}, ${flipVertical ? -1 : 1})`
+                }
+              }}
             />
           )}
         </Box>
@@ -199,15 +218,16 @@ const ImageEditorDrawer = ({ open, image, onClose, onSave }) => {
             {/* Zoom Control */}
             <Box sx={{ px: isMobile ? 1 : 2 }}>
               <Typography gutterBottom variant={isMobile ? "body2" : "body1"}>
-                Zoom
+                Zoom ({zoom.toFixed(1)}x)
               </Typography>
               <Slider
                 value={zoom}
-                min={1}
+                min={0.5}
                 max={3}
                 step={0.1}
-                onChange={(e, value) => setZoom(value)}
+                onChange={handleZoomChange}
                 size={isMobile ? "small" : "medium"}
+                aria-label="Zoom"
               />
             </Box>
 
